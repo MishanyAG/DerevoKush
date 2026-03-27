@@ -323,7 +323,17 @@ def enforce_tree_connectivity(states: List[EdgeState]) -> List[EdgeState]:
                 if child not in visited_nodes:
                     visited_nodes.add(child)
                     queue.append(child)
+                    
+    # Специальное правило AND для G20:
+    # G20 считается корректно построенным только если активны обе дуги к F34 и F35.
+    g20_f34 = ("G20", "F34") in reachable_edges
+    g20_f35 = ("G20", "F35") in reachable_edges
 
+    if not (g20_f34 and g20_f35):
+        reachable_edges.discard(("G20", "F34"))
+        reachable_edges.discard(("G20", "F35"))
+        reachable_edges.discard(("G6", "G20"))
+        
     filtered_states: List[EdgeState] = []
     for s in states:
         filtered_states.append(
